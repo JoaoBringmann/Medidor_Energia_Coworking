@@ -5,6 +5,9 @@ O Smart Coworking é uma solução completa de IoT que transforma o modelo de ne
 
 O sistema integra hardware de medição, processamento de dados em containers e interfaces multiplataforma para garantir transparência ao cliente e controle total ao proprietário
 
+#Overview
+![Arquitetura do Projeto](./docs/overview.svg)
+
 
 ## Authors
 
