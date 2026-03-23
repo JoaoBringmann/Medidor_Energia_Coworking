@@ -1,0 +1,41 @@
+services:
+  # Serviço do Banco de Dados (PostgreSQL)
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
+      POSTGRES_DB: ${DB_NAME:-projeto_faculdade}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Interface Visual para o Banco (Adminer)
+  adminer:
+    image: adminer
+    container_name: adminer_gui
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  # App Python para o Pipeline de Dados
+  app:
+    build: .
+    container_name: data_pipeline_app
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-password123}
+      - DB_NAME=${DB_NAME:-projeto_faculdade}
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
