@@ -1,0 +1,26 @@
+# ==========================================
+# ⚡ Smart COWORKING - Requirements Técnicos
+# ==========================================
+
+# --- 1. Framework Web e Servidor ASGI ---
+fastapi==0.110.0
+uvicorn==0.27.1
+# Motivo: FastAPI é atualmente a escolha mais recomendada para APIs modernas em Python devido à sua alta performance e suporte nativo a operações assíncronas. O Uvicorn é o servidor padrão da indústria para rodar o FastAPI.
+
+# --- 2. Comunicação IoT (Mensageria) ---
+paho-mqtt==2.0.0
+# Motivo: É a biblioteca padrão e mais madura para criar clientes MQTT em Python, permitindo que a API "escute" os dados do ESP32 via Mosquitto.
+
+# --- 3. Banco de Dados de Séries Temporais (Métricas de Energia) ---
+influxdb-client==1.40.0
+# Motivo: Cliente oficial do InfluxDB 2.x. Possui métodos otimizados (como gravação em lote) essenciais para não sobrecarregar o banco de dados quando muitos PCs estiverem enviando os Watts simultaneamente.
+
+# --- 4. Banco de Dados Relacional (Cadastros e Créditos) ---
+SQLAlchemy==2.0.28
+psycopg2-binary==2.9.9
+# Motivo: O SQLAlchemy é o ORM (Object-Relational Mapper) mais consolidado do mercado Python, facilitando a modelagem das tabelas do cliente sem escrever SQL puro. O psycopg2-binary é o driver essencial para que o Python consiga conversar com o container do PostgreSQL.
+
+# --- 5. Utilitários e Segurança ---
+python-dotenv==1.0.1
+qrcode[pil]==7.4.2
+# Motivo: O dotenv garante a leitura segura das senhas e tokens. A biblioteca qrcode (junto com o suporte de imagem 'pil') permite que a sua própria API gere a imagem do QR Code e envie para o PC da LAN House, caso você opte por centralizar essa lógica no backend.

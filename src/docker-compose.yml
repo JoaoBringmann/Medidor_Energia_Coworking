@@ -1,5 +1,47 @@
 services:
-  # Serviço do Banco de Dados (PostgreSQL)
+  # 1. Broker MQTT (Comunicação de Baixa Latência com o ESP32)
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mqtt_broker
+    restart: always
+    ports:
+      - "1883:1883" # Porta padrão MQTT
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  # 2. Banco de Dados de Séries Temporais (Armazena os Watts/segundo)
+  influxdb:
+    image: influxdb:2.0
+    container_name: influxdb_energia
+    restart: always
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUX_USER:-admin}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUX_PASSWORD:-admin12345}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUX_ORG:-clinica_ti}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUX_BUCKET:-consumo_watts}
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
+  # 3. Dashboard do Gerente (Conectado ao InfluxDB)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_dashboard
+    restart: always
+    ports:
+      - "3000:3000" # Acesse localhost:3000 para ver os gráficos
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  # 4. Banco de Dados Relacional (Cadastros, Sessões e Créditos)
   db:
     image: postgres:15
     container_name: postgres_db
@@ -7,35 +49,37 @@ services:
     environment:
       POSTGRES_USER: ${DB_USER:-admin}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
-      POSTGRES_DB: ${DB_NAME:-projeto_faculdade}
+      POSTGRES_DB: ${DB_NAME:-smart_lan}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # Interface Visual para o Banco (Adminer)
-  adminer:
-    image: adminer
-    container_name: adminer_gui
+  # 5. API Backend (Python FastAPI)
+  api:
+    build: .
+    container_name: backend_api
     restart: always
     ports:
-      - "8080:8080"
-    depends_on:
-      - db
-
-  # App Python para o Pipeline de Dados
-  app:
-    build: .
-    container_name: data_pipeline_app
+      - "8000:8000" # Porta para os PCs e Celulares consumirem os dados
     volumes:
       - .:/app
     environment:
       - DB_HOST=db
       - DB_USER=${DB_USER:-admin}
       - DB_PASSWORD=${DB_PASSWORD:-password123}
-      - DB_NAME=${DB_NAME:-projeto_faculdade}
+      - DB_NAME=${DB_NAME:-smart_lan}
+      - MQTT_BROKER=mosquitto
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=${INFLUX_TOKEN}
     depends_on:
       - db
+      - mosquitto
+      - influxdb
 
 volumes:
   postgres_data:
+  mosquitto_data:
+  mosquitto_log:
+  influxdb_data:
+  grafana_data:
