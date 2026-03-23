@@ -11,5 +11,8 @@ O sistema integra hardware de medição, processamento de dados em containers e 
 
 ## Authors
 
-- [@JoaoBringmann](https://www.github.com/JoaoBringmann)
-
+- [@Joao](https://www.github.com/JoaoBringmann)
+- [@Gabriel](https://github.com/dogo-o)
+- [@Eduardo](https://github.com/EduardoMonteiroHinz)
+- [@Leonardo](https://github.com/leograttao)
+- [@Mauricio](https://github.com/maugazda)
