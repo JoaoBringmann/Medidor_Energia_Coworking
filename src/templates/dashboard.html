@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Medidor de Energia</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard do Gerente</h1>
+        <a href="/logout">Logout</a>
+        <div class="metrics">
+            <div class="metric">
+                <h2>Tempo Total de Uso</h2>
+                <p>{{ "%.2f"|format(total_usage_time) }} horas</p>
+            </div>
+            <div class="metric">
+                <h2>Energia Total Gasta</h2>
+                <p>{{ "%.2f"|format(total_energy) }} kWh</p>
+            </div>
+            <div class="metric">
+                <h2>Total Pago</h2>
+                <p>R$ {{ "%.2f"|format(total_paid) }}</p>
+            </div>
+        </div>
+        <canvas id="outletChart"></canvas>
+    </div>
+    <script>
+        const labels = {{ outlet_data | tojson }}.map(d => d.name);
+        const dataValues = {{ outlet_data | tojson }}.map(d => d.energy);
+        const ctx = document.getElementById('outletChart').getContext('2d');
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Energia por Tomada (kWh)',
+                data: dataValues,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        };
+        const config = {
+            type: 'bar',
+            data: data,
+        };
+        new Chart(ctx, config);
+    </script>
+</body>
+</html>
