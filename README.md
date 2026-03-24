@@ -5,6 +5,14 @@ O Smart Coworking é uma solução completa de IoT que transforma o modelo de ne
 
 O sistema integra hardware de medição, processamento de dados em containers e interfaces multiplataforma para garantir transparência ao cliente e controle total ao proprietário.
 
+## Deployment
+
+Para utilizar o projeto baixe Docker Desktop, rode no terminal:
+
+```bash
+  docker-compose up --build
+```
+
 #Overview
 ![Arquitetura do Projeto](./docs/overview.svg)
 
