@@ -28,14 +28,16 @@ services:
     container_name: grafana_dashboard
     restart: always
     ports:
-      - "3000:3000" # Acesse localhost:3000 para ver os gráficos
+      - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+      - GF_INSTALL_PLUGINS=grafana-influxdb-flux-datasource
     depends_on:
       - influxdb
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
 
   # Redis para cache
   redis:

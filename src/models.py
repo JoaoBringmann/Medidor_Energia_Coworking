@@ -8,7 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    role = Column(String, default="user")  # admin, user
+    role = Column(String, default="user")
 
 class Session(Base):
     __tablename__ = "sessions"

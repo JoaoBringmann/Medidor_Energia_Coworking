@@ -7,9 +7,10 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from database import get_db
 from models import User
+from config import TEMPLATES_DIR
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
@@ -56,8 +57,6 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     response = RedirectResponse(url="/dashboard", status_code=302)
     response.set_cookie(key="access_token", value=access_token, httponly=True)
     return response
-
-@router.get("/logout")
 def logout():
     response = RedirectResponse(url="/login", status_code=302)
     response.delete_cookie("access_token")

@@ -1,50 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Medidor de Energia</title>
     <link rel="stylesheet" href="/static/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Dashboard do Gerente</h1>
-        <a href="/logout">Logout</a>
-        <div class="metrics">
-            <div class="metric">
-                <h2>Tempo Total de Uso</h2>
-                <p>{{ "%.2f"|format(total_usage_time) }} horas</p>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚡ Smart Coworking</div>
             </div>
-            <div class="metric">
-                <h2>Energia Total Gasta</h2>
-                <p>{{ "%.2f"|format(total_energy) }} kWh</p>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" style="color: white; border-left-color: var(--secondary-color);">Dashboard</a>
+                <a href="/reports">Relatórios</a>
+                <a href="#" style="opacity: 0.5; cursor: not-allowed;">Usuários</a>
+                <a href="#" style="opacity: 0.5; cursor: not-allowed;">Configurações</a>
+                <button onclick="logout();">Logout</button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <div class="user-avatar">A</div>
+                        <span>Admin</span>
+                    </div>
+                    <button class="logout-btn" onclick="logout();">Sair</button>
+                </div>
+            </header>
+
+            <section class="metrics-grid">
+                <div class="metric-card usage">
+                    <div class="metric-label">⏱️ Tempo Total de Uso</div>
+                    <div class="metric-value">{{ "%.1f"|format(total_usage_time) }}</div>
+                    <div style="color: var(--text-secondary); font-size: 12px;">horas</div>
+                    <div class="metric-change">↑ Últimos 30 dias</div>
+                </div>
+
+                <div class="metric-card energy">
+                    <div class="metric-label">⚡ Energia Total Gasta</div>
+                    <div class="metric-value">{{ "%.2f"|format(total_energy) }}</div>
+                    <div style="color: var(--text-secondary); font-size: 12px;">kWh</div>
+                    <div class="metric-change">↑ Últimos 30 dias</div>
+                </div>
+
+                <div class="metric-card revenue">
+                    <div class="metric-label">💰 Total Pago</div>
+                    <div class="metric-value">R$ {{ "%.2f"|format(total_paid) }}</div>
+                    <div style="color: var(--text-secondary); font-size: 12px;">faturado</div>
+                    <div class="metric-change">↑ Últimos 30 dias</div>
+                </div>
+            </section>
+
+            <section class="charts-section">
+                <div class="chart-container">
+                    <h3>📊 Consumo por Tomada (kWh)</h3>
+                    <canvas id="outletChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>📈 Distribuição de Energia</h3>
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </section>
+
+            <div class="chart-container">
+                <h3>🔌 Detalhes de Tomadas</h3>
+                <table class="outlet-table">
+                    <thead>
+                        <tr>
+                            <th>Tomada</th>
+                            <th>Localização</th>
+                            <th>Consumo (kWh)</th>
+                            <th>Percentual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for outlet in outlet_data %}
+                        <tr>
+                            <td><span class="outlet-tag">{{ outlet.name }}</span></td>
+                            <td>Sala 1</td>
+                            <td>{{ "%.2f"|format(outlet.energy) }} kWh</td>
+                            <td>{{ "%.1f"|format((outlet.energy / (total_energy if total_energy > 0 else 1)) * 100) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="metric">
-                <h2>Total Pago</h2>
-                <p>R$ {{ "%.2f"|format(total_paid) }}</p>
-            </div>
-        </div>
-        <canvas id="outletChart"></canvas>
+        </main>
     </div>
+
     <script>
-        const labels = {{ outlet_data | tojson }}.map(d => d.name);
-        const dataValues = {{ outlet_data | tojson }}.map(d => d.energy);
-        const ctx = document.getElementById('outletChart').getContext('2d');
-        const data = {
-            labels: labels,
-            datasets: [{
-                label: 'Energia por Tomada (kWh)',
-                data: dataValues,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        };
-        const config = {
+        function logout() {
+            if (confirm('Deseja sair?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        const outletData = {{ outlet_data | tojson }};
+        const labels = outletData.map(d => d.name);
+        const dataValues = outletData.map(d => d.energy);
+        const colors = [
+            'rgba(0, 102, 204, 0.7)',
+            'rgba(255, 153, 0, 0.7)',
+            'rgba(26, 188, 156, 0.7)',
+            'rgba(243, 156, 18, 0.7)',
+            'rgba(231, 76, 60, 0.7)',
+            'rgba(155, 89, 182, 0.7)'
+        ];
+
+        const ctxBar = document.getElementById('outletChart').getContext('2d');
+        new Chart(ctxBar, {
             type: 'bar',
-            data: data,
-        };
-        new Chart(ctx, config);
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Consumo (kWh)',
+                    data: dataValues,
+                    backgroundColor: colors,
+                    borderColor: colors.map(c => c.replace('0.7', '1')),
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dataValues,
+                    backgroundColor: colors,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 12 },
+                            padding: 15
+                        }
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>

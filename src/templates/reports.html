@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Medidor de Energia</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚡ Smart Coworking</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/reports" style="color: white; border-left-color: var(--secondary-color);">Relatórios</a>
+                <a href="#" style="opacity: 0.5; cursor: not-allowed;">Usuários</a>
+                <a href="#" style="opacity: 0.5; cursor: not-allowed;">Configurações</a>
+                <button onclick="logout();">Logout</button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1>Relatórios Avançados</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <div class="user-avatar">A</div>
+                        <span>Admin</span>
+                    </div>
+                    <button class="logout-btn" onclick="logout();">Sair</button>
+                </div>
+            </header>
+
+            <div class="chart-container" style="height: 700px;">
+                <iframe 
+                    src="{{ grafana_url }}/d/generic/generic_dashboard" 
+                    style="width: 100%; height: 100%; border: none; border-radius: 8px;"
+                    allowfullscreen
+                ></iframe>
+            </div>
+
+            <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: var(--shadow);">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">ℹ️ Dica</h3>
+                <p style="color: var(--text-secondary); font-size: 14px;">
+                    Acesse <strong><a href="http://localhost:3000" target="_blank">Grafana ( Grafana )</a></strong> diretamente para criar dashboards personalizados e adicionar novos gráficos.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm('Deseja sair?')) {
+                window.location.href = '/logout';
+            }
+        }
+    </script>
+</body>
+</html>

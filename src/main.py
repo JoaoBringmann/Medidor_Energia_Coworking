@@ -7,23 +7,23 @@ from models import Base
 from sqlalchemy.orm import Session
 from models import User
 from passlib.context import CryptContext
+from config import STATIC_DIR, TEMPLATES_DIR
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 app.include_router(auth.router)
 app.include_router(dashboard.router)
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 @app.get("/")
 def root():
     return {"message": "API do Medidor de Energia"}
 
-# Criar admin inicial
 @app.on_event("startup")
 def create_admin():
     db = Session(engine)
