@@ -57,8 +57,12 @@ O sistema integra hardware de medição, processamento de dados em containers e 
    ```bash
    docker-compose up --build
    ```
+3. Para realização dos testes:
+   ```bash
+   docker exec -it backend_api python setup_teste.py
+   ```
 
-3. Acesse a aplicação:
+4. Acesse a aplicação:
    - **Site do Gerente**: http://localhost (login: admin, senha: admin123)
    - **Grafana**: http://localhost:3000 (admin/admin123)
    - **API**: http://localhost:8000 (interna, via Apache)
