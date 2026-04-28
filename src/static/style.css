@@ -260,6 +260,72 @@ body {
     transform: translateY(-2px);
 }
 
+.primary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0052a3 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.18);
+    margin-top: 20px;
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+}
+
+.report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.report-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.report-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 16px;
+    background: #f8f9fa;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.report-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.report-panel {
+    border: 1px solid rgba(0, 102, 204, 0.08);
+}
+
+.report-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.report-options input {
+    width: 16px;
+    height: 16px;
+}
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

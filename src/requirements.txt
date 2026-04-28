@@ -29,4 +29,5 @@ python-multipart==0.0.6
 alembic==1.13.1
 passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0
-# Motivo: Jinja2 para templates HTML, python-multipart para forms, alembic para migrations DB, passlib para hash de senhas, python-jose para JWT.
+fpdf==1.7.2
+# Motivo: Jinja2 para templates HTML, python-multipart para forms, alembic para migrations DB, passlib para hash de senhas, python-jose para JWT, fpdf para geração de relatórios em PDF. 

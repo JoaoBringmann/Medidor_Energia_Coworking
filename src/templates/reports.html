@@ -35,18 +35,26 @@
                 </div>
             </header>
 
-            <div class="chart-container" style="height: 700px;">
-                <iframe 
-                    src="{{ grafana_url }}/d/generic/generic_dashboard" 
-                    style="width: 100%; height: 100%; border: none; border-radius: 8px;"
-                    allowfullscreen
-                ></iframe>
+            <div class="report-card report-panel" style="height: auto; padding: 30px;">
+                <h2>Gerar Relatório em PDF</h2>
+                <p class="report-description">
+                    Selecione os itens que deseja incluir no relatório e clique em <strong>Gerar PDF</strong>. O arquivo será baixado automaticamente.
+                </p>
+                <form action="/reports/pdf" method="post" class="report-form">
+                    <div class="report-options">
+                        <label><input type="checkbox" name="include_usage" checked> Tempo total de uso</label>
+                        <label><input type="checkbox" name="include_energy" checked> Energia total gasta</label>
+                        <label><input type="checkbox" name="include_paid" checked> Total pago</label>
+                        <label><input type="checkbox" name="include_outlets" checked> Consumo por tomada</label>
+                    </div>
+                    <button type="submit" class="primary-btn">Gerar PDF</button>
+                </form>
             </div>
 
-            <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: var(--shadow);">
-                <h3 style="color: var(--primary-color); margin-bottom: 10px;">ℹ️ Dica</h3>
-                <p style="color: var(--text-secondary); font-size: 14px;">
-                    Acesse <strong><a href="http://localhost:3000" target="_blank">Grafana ( Grafana )</a></strong> diretamente para criar dashboards personalizados e adicionar novos gráficos.
+            <div class="report-card report-panel" style="margin-top: 20px; padding: 20px;">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">ℹ️ Informação</h3>
+                <p class="report-description">
+                    Este relatório em PDF é gerado diretamente dos dados de consumo e créditos do sistema. Não depende de dashboards externos para montar o arquivo.
                 </p>
             </div>
         </main>
