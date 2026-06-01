@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Medidor de Energia</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚡ Smart Coworking</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="{% if request.url.path == '/dashboard' %}active{% endif %}">Dashboard</a>
+                <a href="/reports" class="{% if request.url.path == '/reports' %}active{% endif %}">Relatórios</a>
+                <a href="#" style="opacity: 0.5; cursor: not-allowed;">Usuários</a>
+                <a href="/settings" class="{% if request.url.path == '/settings' %}active{% endif %}">Configurações</a>
+                <button onclick="logout();">Logout</button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1>Configurações</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <div class="user-avatar">A</div>
+                        <span>Admin</span>
+                    </div>
+                    <button class="logout-btn" onclick="logout();">Sair</button>
+                </div>
+            </header>
+
+            {% if message %}
+            <div class="success-banner">✅ {{ message }}</div>
+            {% endif %}
+
+            <div class="settings-container">
+                <div class="settings-section settings-card">
+                    <h2>📱 Registrar Tomada Inteligente</h2>
+                    <p class="settings-description">
+                        Cadastre suas tomadas inteligentes para que o dashboard associe o consumo coletado no InfluxDB a cada dispositivo.
+                    </p>
+                    <form method="post" action="/settings/outlet/add"> <div class="form-group">
+                            <label for="outlet_name">Nome da Tomada:</label>
+                            <input type="text" id="outlet_name" name="outlet_name" placeholder="Ex: Estação 01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="outlet_location">Localização (Mesa/Setor):</label>
+                            <input type="text" id="outlet_location" name="outlet_location" placeholder="Ex: Sala Principal" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tuya_device_id">Device ID (ID do Dispositivo):</label>
+                            <input type="text" id="tuya_device_id" name="tuya_device_id" placeholder="Pegue no app Tuya ou log do wizard" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tuya_api_key">Chave Local (Local Key):</label>
+                            <input type="text" id="tuya_api_key" name="tuya_api_key" placeholder="Ex: 5(NTqF@)sR~)v*F0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tuya_api_secret">IP Local da Tomada:</label>
+                            <input type="text" id="tuya_api_secret" name="tuya_api_secret" placeholder="Ex: 192.168.1.244" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Salvar Configuração Local</button>
+                    </form>
+
+                    <div class="info-box">
+                        <h4>ℹ️ Como cadastrar a tomada</h4>
+                        <ol>
+                            <li>Abra o app Tuya ou Smart Life</li>
+                            <li>Encontre o <strong>Device ID</strong> da tomada</li>
+                            <li>Cadastre o dispositivo aqui com o nome, localização e Device ID</li>
+                            <li>Verifique se o pipeline de consumo grava dados no InfluxDB</li>
+                        </ol>
+                    </div>
+                </div>
+
+                {% if outlets %}
+                <div class="settings-section settings-card">
+                    <h2>🔌 Tomadas Registradas</h2>
+                    <div class="outlets-list">
+                        {% for outlet in outlets %}
+                        <div class="outlet-item">
+                            <div class="outlet-info">
+                                <h3>{{ outlet.name }}</h3>
+                                <p><strong>📍 Local:</strong> {{ outlet.location }}</p>
+                                <p><strong>🆔 Device ID:</strong> <code>{{ outlet.tuya_device_id }}</code></p>
+                                <p><strong>🌍 Região:</strong> {{ outlet.tuya_region }}</p>
+                                <p><strong>📡 Status:</strong> 
+                                    {% if outlet.is_connected %}
+                                        <span class="status-badge connected">✅ Conectada</span>
+                                    {% else %}
+                                        <span class="status-badge disconnected">❌ Desconectada</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="outlet-actions">
+                                <button class="btn btn-edit" onclick="editOutlet({{ outlet.id }})">Editar</button>
+                                <form method="post" action="/settings/outlet/delete/{{ outlet.id }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-delete" onclick="return confirm('Tem certeza que deseja remover esta tomada?')">Remover</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm('Deseja sair?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        function editOutlet(outletId) {
+            alert('Edição de tomadas em desenvolvimento. ID: ' + outletId);
+        }
+    </script>
+</body>
+</html>

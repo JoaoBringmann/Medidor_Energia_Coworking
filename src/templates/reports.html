@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Medidor de Energia</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚡ Smart Coworking</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="{% if request.url.path == '/dashboard' %}active{% endif %}">Dashboard</a>
+                <a href="/reports" class="{% if request.url.path == '/reports' %}active{% endif %}">Relatórios</a>
+                <a href="#" style="opacity: 0.5; cursor: not-allowed;">Usuários</a>
+                <a href="/settings" class="{% if request.url.path == '/settings' %}active{% endif %}">Configurações</a>
+                <button onclick="logout();">Logout</button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1>Relatórios Avançados</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <div class="user-avatar">A</div>
+                        <span>Admin</span>
+                    </div>
+                    <button class="logout-btn" onclick="logout();">Sair</button>
+                </div>
+            </header>
+
+            <div class="report-card report-panel" style="height: auto; padding: 30px;">
+                <h2>Gerar Relatório em PDF</h2>
+                <p class="report-description">
+                    Selecione os itens que deseja incluir no relatório e clique em <strong>Gerar PDF</strong>. O arquivo será baixado automaticamente.
+                </p>
+                <form action="/reports/pdf" method="post" class="report-form">
+                    <div class="report-options">
+                        <label><input type="checkbox" name="include_usage" checked> Tempo total de uso</label>
+                        <label><input type="checkbox" name="include_energy" checked> Energia total gasta</label>
+                        <label><input type="checkbox" name="include_paid" checked> Total pago</label>
+                        <label><input type="checkbox" name="include_outlets" checked> Consumo por tomada</label>
+                    </div>
+                    <button type="submit" class="primary-btn">Gerar PDF</button>
+                </form>
+            </div>
+
+            <div class="report-card report-panel" style="margin-top: 20px; padding: 20px;">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">ℹ️ Informação</h3>
+                <p class="report-description">
+                    Este relatório em PDF é gerado diretamente dos dados de consumo e créditos do sistema. Não depende de dashboards externos para montar o arquivo.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm('Deseja sair?')) {
+                window.location.href = '/logout';
+            }
+        }
+    </script>
+</body>
+</html>

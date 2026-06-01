@@ -1,0 +1,96 @@
+services:
+  # Banco de Dados de Séries Temporais (Armazena os Watts/segundo)
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb_energia
+    restart: always
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=consumo_watts
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+
+  # Banco de Dados Relacional (Cadastros, Sessões e Créditos)
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
+      POSTGRES_DB: ${DB_NAME:-smart_lan}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DB_USER:-admin} -d $${DB_NAME:-smart_lan}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Servidor Web Apache
+  apache:
+    image: httpd:2.4
+    container_name: apache_web
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+    depends_on:
+      - api
+
+  # API Backend (Python FastAPI)
+  api:
+    build: .
+    container_name: backend_api
+    restart: always
+    ports:
+      - "8000:8000" # Porta para os PCs e Celulares consumirem os dados
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-password123}
+      - DB_NAME=${DB_NAME:-smart_lan}
+      - INFLUX_URL=http://influxdb:8086
+    depends_on:
+      - db
+      - influxdb
+
+  # NAS com Samba (simulando OpenMediaVault)
+  nas:
+    image: dperson/samba
+    container_name: samba_nas
+    restart: always
+    ports:
+      - "1445:445"
+      - "1139:139"
+    volumes:
+      - samba_data:/mnt
+    command: '-s "shared;/mnt;yes;no;yes;;admin" -u "admin;admin123" -p'
+
+  # Serviço Coletor Local em Tempo Real
+  coletor:
+    build: .
+    container_name: coletor_tuya
+    restart: always
+    command: python coletor_tuya.py
+    depends_on:
+      db:
+        condition: service_healthy
+      influxdb:
+        condition: service_started
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-password123}
+      - DB_NAME=${DB_NAME:-smart_lan}
+
+volumes:
+  postgres_data:
+  influxdb_data:
+  samba_data:
